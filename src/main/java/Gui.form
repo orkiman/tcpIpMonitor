@@ -119,7 +119,7 @@
               </grid>
             </constraints>
             <properties>
-              <text value="127.0.0.1"/>
+              <text value="192.168.7.77"/>
             </properties>
           </component>
           <component id="72982" class="javax.swing.JButton" binding="clientConnectButton">

@@ -77,6 +77,7 @@ public class Gui {
 
             }
         });
+
     }
 
 
@@ -122,6 +123,11 @@ public class Gui {
 
         @Override
         public void run() {
+            String hostname = "time.nist.gov";
+            int port = 13;
+
+//            try (Socket socket = new Socket(hostname, port)) {
+
             try (Socket socket = new Socket(clientTargetServerIpTextField.getText(), Integer.parseInt(portTextField.getText()))) {
                 Style massagesStyle = clientMassagesTextPane.addStyle("massagesStyle", null);
                 StyleConstants.setForeground(massagesStyle, new Color(0,100,0));
