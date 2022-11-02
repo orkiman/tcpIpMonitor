@@ -36,7 +36,8 @@ public class Gui {
                         new Thread(()->{
                             try {
                                 Socket socket = serverSocket.accept();
-                                massageTextPane.getStyledDocument().insertString(doc.getLength(),"new client connected",new SimpleAttributeSet());
+                                massageTextPane.getStyledDocument().insertString(doc.getLength(),"new client connected : "+
+                                       socket.getInetAddress(),new SimpleAttributeSet());
                                 InputStream inputStream = socket.getInputStream();
                                 OutputStream outputStream = socket.getOutputStream();
 
@@ -46,29 +47,29 @@ public class Gui {
                         }).start();
 
 
-
-                            Socket socket = serverSocket.accept();
-
-                            System.out.println("New client connected");
-
-                            OutputStream output = socket.getOutputStream();
-                            PrintWriter writer = new PrintWriter(output, true);
-
-                            writer.println(new Date().toString());
+//
+//                            Socket socket = serverSocket.accept();
+//
+//                            System.out.println("New client connected");
+//
+//                            OutputStream output = socket.getOutputStream();
+//                            PrintWriter writer = new PrintWriter(output, true);
+//
+//                            writer.println(new Date().toString());
                         } catch (IOException | BadLocationException ex) {
                         throw new RuntimeException(ex);
                     }
 
-                } catch (IOException ex) {
-                        System.out.println("Server exception: " + ex.getMessage());
-                        ex.printStackTrace();
-                    }
-//                    try(serverSocket = new ServerSocket(port)){
-//                        serverSocket.accept();
-//                    }catch (IOException ex) {
+//                } catch (IOException ex) {
 //                        System.out.println("Server exception: " + ex.getMessage());
 //                        ex.printStackTrace();
 //                    }
+////                    try(serverSocket = new ServerSocket(port)){
+////                        serverSocket.accept();
+////                    }catch (IOException ex) {
+////                        System.out.println("Server exception: " + ex.getMessage());
+////                        ex.printStackTrace();
+////                    }
                 }
             }
         });
