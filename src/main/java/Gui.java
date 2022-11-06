@@ -1,8 +1,9 @@
 import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,13 +11,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Gui {
-    private JPanel serverPanel;
-    private JPanel clientPanel;
     private JLabel serverStateLable;
     private JButton serverRunButton;
     private JTextField portTextField;
     private JPanel formPanel;
-    private JScrollPane serverScrollPane;
     private JTextPane serverMassageTextPane;
     private JTextField serverSendTextField;
     private JButton serverSendButton;
@@ -33,50 +31,33 @@ public class Gui {
 
     public Gui() {
 
-        serverRunButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Thread(server).start();
-
+        serverRunButton.addActionListener(e -> new Thread(server).start());
+        serverSendButton.addActionListener(e -> {
+            try {
+                serverOutputStream.write(serverSendTextField.getText().getBytes());
+                serverOutputStream.write(System.lineSeparator().getBytes());
+                serverOutputStream.flush();
+                Style outStyle = serverMassageTextPane.getStyle("outStyle");
+                StyledDocument doc = serverMassageTextPane.getStyledDocument();
+                doc.insertString(doc.getLength(), "out : " + serverSendTextField.getText() + System.lineSeparator(), outStyle);
+            } catch (IOException | BadLocationException ex) {
+                throw new RuntimeException(ex);
             }
         });
-        serverSendButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    serverOutputStream.write(serverSendTextField.getText().getBytes());
-                    serverOutputStream.write(System.lineSeparator().getBytes());
-                    serverOutputStream.flush();
-                    Style outStyle = serverMassageTextPane.getStyle("outStyle");
-                    StyledDocument doc = serverMassageTextPane.getStyledDocument();
-                    doc.insertString(doc.getLength(), "out : " + serverSendTextField.getText() + System.lineSeparator(), outStyle);
-                } catch (IOException | BadLocationException ex) {
-                    throw new RuntimeException(ex);
-                }
+        clientConnectButton.addActionListener(e -> new Thread(client).start());
+        sendButton.addActionListener(e -> {
+            try {
+                clientOutputStream.write(clientSendTextField.getText().getBytes());
+                clientOutputStream.write(System.lineSeparator().getBytes());
+                clientOutputStream.flush();
+                Style outStyle = clientMassagesTextPane.getStyle("outStyle");
+                StyledDocument doc = clientMassagesTextPane.getStyledDocument();
+                doc.insertString(doc.getLength(), "out : " + clientSendTextField.getText() + System.lineSeparator(), outStyle);
+            } catch (IOException | BadLocationException ex) {
+                throw new RuntimeException(ex);
             }
-        });
-        clientConnectButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Thread(client).start();
-            }
-        });
-        sendButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    clientOutputStream.write(clientSendTextField.getText().getBytes());
-                    clientOutputStream.write(System.lineSeparator().getBytes());
-                    clientOutputStream.flush();
-                    Style outStyle = clientMassagesTextPane.getStyle("outStyle");
-                    StyledDocument doc = clientMassagesTextPane.getStyledDocument();
-                    doc.insertString(doc.getLength(), "out : " + clientSendTextField.getText() + System.lineSeparator(), outStyle);
-                } catch (IOException | BadLocationException ex) {
-                    throw new RuntimeException(ex);
-                }
 
 
-            }
         });
 
     }
@@ -111,7 +92,14 @@ public class Gui {
                 StyleConstants.setForeground(massagesStyle, Color.black);
 
                 while (true) {
-                    String s = Character.toString((char) inputStream.read());
+//                    String s = Character.toString((char) inputStream.read());
+                    String s;
+                    int input = inputStream.read();
+                    if (HEXDisplayCheckBox.isSelected()) {
+                        s="<"+input+">";
+                    } else {
+                        s = Character.toString((char) input);
+                    }
                     doc.insertString(doc.getLength(), s, inStyle);
                 }
             } catch (IOException | BadLocationException e) {
@@ -124,11 +112,6 @@ public class Gui {
 
         @Override
         public void run() {
-            String hostname = "time.nist.gov";
-            int port = 13;
-
-//            try (Socket socket = new Socket(hostname, port)) {
-
             try (Socket socket = new Socket(clientTargetServerIpTextField.getText(), Integer.parseInt(portTextField.getText()))) {
                 Style massagesStyle = clientMassagesTextPane.addStyle("massagesStyle", null);
                 StyleConstants.setForeground(massagesStyle, new Color(0, 100, 0));
@@ -151,8 +134,6 @@ public class Gui {
                     String s;
                     int input = inputStream.read();
                     if (HEXDisplayCheckBox.isSelected()) {
-//                        s = Integer.toHexString(inputStream.read());
-//                        s = Integer.toString(inputStream.read());
                         s="<"+input+">";
                     } else {
                         s = Character.toString((char) input);
