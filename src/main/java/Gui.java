@@ -26,6 +26,7 @@ public class Gui {
     private JButton sendButton;
     private JTextPane clientMassagesTextPane;
     private JLabel clientStateLable;
+    private JCheckBox HEXDisplayCheckBox;
     private OutputStream serverOutputStream;
     private OutputStream clientOutputStream;
 
@@ -89,14 +90,14 @@ public class Gui {
                 serverRunButton.setEnabled(false);
                 portTextField.setEnabled(false);
                 Style massagesStyle = serverMassageTextPane.addStyle("massagesStyle", null);
-                StyleConstants.setForeground(massagesStyle, new Color(0,100,0));
-                StyleConstants.setFontSize(massagesStyle,20);
+                StyleConstants.setForeground(massagesStyle, new Color(0, 100, 0));
+                StyleConstants.setFontSize(massagesStyle, 20);
                 Style inStyle = serverMassageTextPane.addStyle("inStyle", null);
-                StyleConstants.setForeground(inStyle, new Color(0,0,0));
-                StyleConstants.setFontSize(inStyle,20);
+                StyleConstants.setForeground(inStyle, new Color(0, 0, 0));
+                StyleConstants.setFontSize(inStyle, 20);
                 Style outStyle = serverMassageTextPane.addStyle("outStyle", null);
-                StyleConstants.setForeground(outStyle, new Color(0,0,150));
-                StyleConstants.setFontSize(outStyle,20);
+                StyleConstants.setForeground(outStyle, new Color(0, 0, 150));
+                StyleConstants.setFontSize(outStyle, 20);
                 serverStateLable.setText("waiting for client");
                 StyledDocument doc = serverMassageTextPane.getStyledDocument();
                 doc.insertString(doc.getLength(), "waiting for client on address " + serverSocket.getInetAddress() + System.lineSeparator(), massagesStyle);
@@ -109,9 +110,9 @@ public class Gui {
                 serverOutputStream = socket.getOutputStream();
                 StyleConstants.setForeground(massagesStyle, Color.black);
 
-                while(true){
-                    String s = Character.toString((char)inputStream.read());
-                    doc.insertString(doc.getLength(),s, inStyle);
+                while (true) {
+                    String s = Character.toString((char) inputStream.read());
+                    doc.insertString(doc.getLength(), s, inStyle);
                 }
             } catch (IOException | BadLocationException e) {
                 throw new RuntimeException(e);
@@ -130,14 +131,14 @@ public class Gui {
 
             try (Socket socket = new Socket(clientTargetServerIpTextField.getText(), Integer.parseInt(portTextField.getText()))) {
                 Style massagesStyle = clientMassagesTextPane.addStyle("massagesStyle", null);
-                StyleConstants.setForeground(massagesStyle, new Color(0,100,0));
-                StyleConstants.setFontSize(massagesStyle,20);
+                StyleConstants.setForeground(massagesStyle, new Color(0, 100, 0));
+                StyleConstants.setFontSize(massagesStyle, 20);
                 Style inStyle = clientMassagesTextPane.addStyle("inStyle", null);
-                StyleConstants.setForeground(inStyle, new Color(0,0,0));
-                StyleConstants.setFontSize(inStyle,20);
+                StyleConstants.setForeground(inStyle, new Color(0, 0, 0));
+                StyleConstants.setFontSize(inStyle, 20);
                 Style outStyle = clientMassagesTextPane.addStyle("outStyle", null);
-                StyleConstants.setForeground(outStyle, new Color(0,0,150));
-                StyleConstants.setFontSize(outStyle,20);
+                StyleConstants.setForeground(outStyle, new Color(0, 0, 150));
+                StyleConstants.setFontSize(outStyle, 20);
                 StyledDocument doc = clientMassagesTextPane.getStyledDocument();
                 doc.insertString(doc.getLength(), "connected to Server at " + socket.getInetAddress() + System.lineSeparator(), massagesStyle);
                 clientStateLable.setText("connected");
@@ -146,10 +147,17 @@ public class Gui {
                 StyleConstants.setForeground(massagesStyle, Color.black);
                 clientConnectButton.setEnabled(false);
 
-                while(true){
-//                    doc.insertString(doc.getLength(),Character.toString((char)inputStream.read()), inStyle);
-                    String s = Character.toString((char)inputStream.read());
-                    doc.insertString(doc.getLength(),s, inStyle);
+                while (true) {
+                    String s;
+                    int input = inputStream.read();
+                    if (HEXDisplayCheckBox.isSelected()) {
+//                        s = Integer.toHexString(inputStream.read());
+//                        s = Integer.toString(inputStream.read());
+                        s="<"+input+">";
+                    } else {
+                        s = Character.toString((char) input);
+                    }
+                    doc.insertString(doc.getLength(), s, inStyle);
                 }
             } catch (IOException | BadLocationException e) {
                 throw new RuntimeException(e);
@@ -162,7 +170,7 @@ public class Gui {
         frame.setContentPane(new Gui().formPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
-        frame.setSize(1200,700);
+        frame.setSize(1200, 700);
         frame.setVisible(true);
     }
 
