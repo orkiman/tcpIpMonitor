@@ -11,6 +11,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Gui {
+    private JPanel serverPanel;
+    private JPanel clientPanel;
     private JLabel serverStateLable;
     private JButton serverRunButton;
     private JTextField portTextField;
